@@ -99,8 +99,9 @@ class UserController extends Controller
         return response()->json(["message" => "Successfully changed password."]);
     }
 
-    public function logout(Request $request){
-      $request->user()->tokens()->delete();
-      return response()->json(['message' => 'Successfully Logout!']);
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'Successfully Logout!']);
     }
 }
