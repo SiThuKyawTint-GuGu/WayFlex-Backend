@@ -10,7 +10,10 @@ class WeightController extends Controller
 {
     public function index()
     {
-        return response()->json(Weight::get());
+        $orderedWeight = Weight::orderBy('id', 'desc')
+        ->get();
+
+        return response()->json($orderedWeight);
     }
 
     public function store(Request $request)

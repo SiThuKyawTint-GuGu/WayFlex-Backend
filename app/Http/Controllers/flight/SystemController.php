@@ -10,7 +10,10 @@ class SystemController extends Controller
 {
     public function index()
     {
-        return response()->json(System::get());
+        $orderedSystem = System::orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($orderedSystem);
     }
 
     public function store(StoreSystemRequest $request)

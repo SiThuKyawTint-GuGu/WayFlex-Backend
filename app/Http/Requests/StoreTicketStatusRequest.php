@@ -24,7 +24,7 @@ class StoreTicketStatusRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', Rule::in(config('enums.ticket_status_type'))],
+            'name' => ['required', Rule::in(config('enums.ticket_status_type')), 'unique:ticket_statuses'],
         ];
     }
 }

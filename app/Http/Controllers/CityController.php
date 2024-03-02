@@ -11,7 +11,11 @@ class CityController extends Controller
 
     public function index()
     {
-        return response()->json(City::with($this->queryWith)->get());
+        $orderedCity = City::with($this->queryWith)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($orderedCity);
     }
 
     public function store(StoreCityRequest $request)

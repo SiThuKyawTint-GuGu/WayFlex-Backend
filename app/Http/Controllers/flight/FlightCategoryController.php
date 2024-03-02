@@ -10,7 +10,10 @@ class FlightCategoryController extends Controller
 {
     public function index()
     {
-        return response()->json(FlightCategory::get());
+        $orderedFlightCategory = FlightCategory::orderBy('id', 'desc')
+        ->get();
+
+        return response()->json($orderedFlightCategory);
     }
 
     public function store(StoreFlightCategoryRequest $request)

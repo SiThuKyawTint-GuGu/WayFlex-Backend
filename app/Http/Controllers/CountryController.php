@@ -9,7 +9,10 @@ class CountryController extends Controller
 {
     public function index()
     {
-        return response()->json(Country::get());
+        $orderedCountry = Country::orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($orderedCountry);
     }
 
     public function store(StoreCountryRequest $request)

@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('meals', function (Blueprint $table) {
+        Schema::create('payment_forms', function (Blueprint $table) {
             $table->id();
-            $table->string("name")->default(null)->nullable(true);
-            $table->unsignedInteger('status_id');
+            $table->unsignedInteger('passenger_type_id');
+            $table->string('card_holder_name')->nullable(false);
+            $table->bigInteger('card_number')->nullable(false);
+            $table->string('expiry_date')->nullable(false);
+            $table->string('cvv')->nullable(false);
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('meals');
+        Schema::dropIfExists('payment_forms');
     }
 };

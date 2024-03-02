@@ -10,7 +10,10 @@ class TripStatusController extends Controller
 {
     public function index()
     {
-        return response()->json(TripStatus::get());
+        $orderedTripStatus = TripStatus::orderBy('id', 'desc')
+        ->get();
+
+        return response()->json($orderedTripStatus);
     }
 
     public function store(StoreTripStatusRequest $request)

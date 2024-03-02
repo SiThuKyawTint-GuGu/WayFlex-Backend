@@ -24,7 +24,7 @@ class StoreMealRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => ['required',Rule::in(config('enums.meal_type'))],
+            'status_id' => 'required|numeric|exists:statuses,id',
         ];
     }
 }

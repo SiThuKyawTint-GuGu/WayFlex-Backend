@@ -9,7 +9,7 @@ class RatingController extends Controller
 {
     public function index()
     {
-        return response()->json(Rating::get());
+        return response()->json(Rating::orderBy('id', 'desc')->get());
     }
 
     public function store(StoreRatingRequest $request)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Flight;
 
+use Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFlightTicketRequest;
 use App\Models\AirlineLeftCol;
@@ -12,7 +13,6 @@ use App\Models\FlightTicket;
 use App\Models\FlightTicketPrice;
 use Exception;
 use Illuminate\Support\Facades\DB;
-
 
 class FlightTicketController extends Controller
 {
@@ -37,10 +37,9 @@ class FlightTicketController extends Controller
 
     public function store(StoreFlightTicketRequest $request)
     {
+
         DB::beginTransaction();
-
         try {
-
             //Create Ticket
             $flightTicket = new FlightTicket();
             $flightTicket->name = $request->name;
@@ -69,11 +68,19 @@ class FlightTicketController extends Controller
             $flightTicket->ticket_status_id = $request->ticket_status_id;
             $flightTicket->meal_id = $request->meal_id;
 
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('FlightTicketImage', 'public');
-                $flightTicket->image = $imagePath;
+            if ($request->has('image')) {
+                try {
+                    $base64Image = $request->image;
+                    list($type, $data) = explode(';', $base64Image);
+                    list(, $data)      = explode(',', $data);
+                    $decodedImage = base64_decode($data);
+                    $filename = 'flight_ticket_' . time() . '.' . explode('/', $type)[1];
+                    Storage::disk('public')->put('FlightTicketImage/' . $filename, $decodedImage);
+                    $flightTicket->image = $filename;
+                } catch (\Exception $e) {
+                    return response()->json(['message' => 'Error storing image', 'error' => $e->getMessage()], 500);
+                }
             }
-
             $flightTicket->save();
 
 
@@ -149,6 +156,7 @@ class FlightTicketController extends Controller
     {
         $flightTicketList = FlightTicket::with(['system', 'departure_airport', 'arrive_airport', 'flight_trip'])
             ->select("id", "name", "system_id", "description", "departure_airport_id", "arrive_airport_id", "flight_trip_id")
+            ->orderBy('id', 'desc')
             ->get();
 
         if (!$flightTicketList->isEmpty()) {
@@ -158,14 +166,16 @@ class FlightTicketController extends Controller
                 $airlineNumber = $this->getAirlineNumber($flightTicket);
 
                 if ($airlineNumber) {
+                    $airlineTotalSeats =$this->getTotalCount($airlineNumber->id);
                     $airlineActiveSeats = $this->getSeatCount($airlineNumber->id, 'active');
                     $airlineDoneSeats = $this->getSeatCount($airlineNumber->id, 'done');
 
                     $seatStatus[] = [
                         'flight_ticket' => $flightTicket,
                         'airline_number' => $airlineNumber,
-                        'activeSeatsCount' => $airlineActiveSeats,
+                        'airlineActiveSeats' => $airlineActiveSeats,
                         'airlineDoneSeats' => $airlineDoneSeats,
+                        'airlineTotalSeats' => $airlineTotalSeats,
                     ];
                 }
             }
@@ -176,13 +186,19 @@ class FlightTicketController extends Controller
 
     protected function getAirlineNumber(FlightTicket $flightTicket)
     {
-        return AirlineNumber::with(['flight_class'])->where('flight_ticket_id', $flightTicket->id)->first();
+        return AirlineNumber::with(['flight_class', 'airline'])->where('flight_ticket_id', $flightTicket->id)->first();
     }
 
     protected function getSeatCount($airlineNumberId, $seatStatus)
     {
+            return AirlineSeat::where('airline_number_id', $airlineNumberId)
+                ->where('seat_status', $seatStatus)
+                ->count();
+    }
+
+    protected function getTotalCount($airlineNumberId)
+    {
         return AirlineSeat::where('airline_number_id', $airlineNumberId)
-            ->where('seat_status', $seatStatus)
             ->count();
     }
 }

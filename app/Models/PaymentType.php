@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Meal extends Model
+class PaymentType extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "status_id",
-        "name"
+            'name',
+            'image'
     ];
-
-    public function status()
-    {
-        return $this->belongsTo(Status::class);
-    }
 }

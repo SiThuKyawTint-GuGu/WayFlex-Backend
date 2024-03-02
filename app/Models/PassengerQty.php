@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Meal extends Model
+class PassengerQty extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "status_id",
-        "name"
+        'passenger_type_id',
+        'qty'
     ];
 
-    public function status()
+    public function passenger_type()
     {
-        return $this->belongsTo(Status::class);
+        return $this->belongsTo(PassengerType::class);
     }
 }

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('meals', function (Blueprint $table) {
+        Schema::create('flight_transaction_seats', function (Blueprint $table) {
             $table->id();
-            $table->string("name")->default(null)->nullable(true);
-            $table->unsignedInteger('status_id');
+            $table->unsignedBigInteger('airline_seat_id');
+            $table->unsignedBigInteger('flight_transaction_id');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('meals');
+        Schema::dropIfExists('flight_transaction_seats');
     }
 };

@@ -12,7 +12,11 @@ class AirportController extends Controller
 
     public function index()
     {
-        return response()->json(Airport::with($this->queryWith)->get());
+        $orderedAirports = Airport::with($this->queryWith)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($orderedAirports);
     }
 
     public function store(StoreAirportRequest $request)
