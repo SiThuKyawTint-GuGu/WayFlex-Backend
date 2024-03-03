@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class PassengerQty extends Model
 {
     use HasFactory;
+
+    protected $table = 'passenger_qtys';
+
     protected $fillable = [
         'passenger_type_id',
         'qty'

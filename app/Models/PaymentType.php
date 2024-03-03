@@ -10,6 +10,7 @@ class PaymentType extends Model
     use HasFactory;
     protected $fillable = [
             'name',
-            'image'
+            'image',
+            'payment_status'
     ];
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\flight\AirlineController;
 use App\Http\Controllers\flight\AirlineNumberController;
@@ -11,8 +12,10 @@ use App\Http\Controllers\flight\FlightCategoryController;
 use App\Http\Controllers\flight\FlightClassController;
 use App\Http\Controllers\flight\FlightTicketController;
 use App\Http\Controllers\flight\FlightTicketPriceController;
+use App\Http\Controllers\flight\FlightTransactionController;
 use App\Http\Controllers\flight\FlightTripController;
 use App\Http\Controllers\flight\MealController;
+use App\Http\Controllers\flight\PassengerTypeController;
 use App\Http\Controllers\flight\StatusController;
 use App\Http\Controllers\flight\SystemController;
 use App\Http\Controllers\flight\TicketStatusController;
@@ -20,6 +23,7 @@ use App\Http\Controllers\flight\TripStatusController;
 use App\Http\Controllers\flight\WeightController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LevelDiscountController;
+use App\Http\Controllers\PaymentTypeController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -50,6 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cities', CityController::class);
     Route::apiResource('level-discount', LevelDiscountController::class);
     Route::apiResource('rating', RatingController::class);
+    Route::apiResource('payment-type', PaymentTypeController::class);
+    Route::apiResource('coupon', CouponController::class);
 
     Route::prefix('flight')->name('flight.')->group(function () {
         Route::apiResource('trip-status', TripStatusController::class);
@@ -68,6 +74,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('meal', MealController::class);
         Route::apiResource('weight', WeightController::class);
         Route::get('flight-ticket-count',[FlightTicketController::class,'ticketCount']);
+        Route::apiResource('passenger-type', PassengerTypeController::class);
+        Route::apiResource('flight-transaction', FlightTransactionController::class);
     });
 });
 

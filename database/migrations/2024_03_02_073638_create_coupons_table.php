@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('coupon_number')->nullable(false);
             $table->bigInteger('amount')->nullable(false);
             $table->date('expire_date')->nullable(false);
+            $table->string('status');
             $table->timestamps();
         });
     }

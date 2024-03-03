@@ -12,7 +12,8 @@ class Coupon extends Model
         "system_id",
         "coupon_number",
         "amount",
-        "expire_date"
+        "expire_date",
+        "status"
     ];
 
     public function system()

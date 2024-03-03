@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('flight_ticket_id');
+            $table->unsignedInteger('payment_type_id');
             $table->bigInteger('ticket_price')->nullable(false);
             $table->bigInteger('fare_tax')->nullable(false);
             $table->bigInteger('total_amount')->nullable(false);
@@ -24,6 +25,8 @@ return new class extends Migration
             $table->integer('passenger_count')->nullable(false);
             $table->integer('seat_count')->nullable(false);
             $table->unsignedInteger('level_discount_id');
+            $table->bigInteger('discount_amount')->nullable(false);
+            $table->bigInteger('normal_amount')->nullable(false);
             $table->timestamps();
         });
     }

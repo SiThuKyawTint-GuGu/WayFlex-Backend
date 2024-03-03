@@ -22,4 +22,5 @@ class FlightTransactionSeat extends Model
     {
         return $this->belongsTo(FlightTransaction::class);
     }
+
 }

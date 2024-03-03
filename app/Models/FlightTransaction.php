@@ -21,6 +21,8 @@ class FlightTransaction extends Model
         "passenger_count",
         "seat_count",
         "level_discount_id",
+        "discount_amount",
+        "normal_amount"
     ];
 
     public function user()
@@ -52,4 +54,17 @@ class FlightTransaction extends Model
     {
         return $this->belongsTo(LevelDiscount::class);
     }
+
+    public function passengers()
+    {
+        return $this->belongsToMany(PassengerQty::class, 'flight_transaction_passengers', 'flight_transaction_id', 'passenger_qty_id')
+        ->withTimestamps();
+    }
+
+    public function seats()
+    {
+        return $this->belongsToMany(AirlineSeat::class, 'flight_transaction_seats', 'flight_transaction_id', 'airline_seat_id')
+        ->withTimestamps();
+    }
+
 }

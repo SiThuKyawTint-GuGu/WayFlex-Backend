@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('payment_forms', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('passenger_type_id');
-            $table->string('card_holder_name')->nullable(false);
-            $table->bigInteger('card_number')->nullable(false);
-            $table->string('expiry_date')->nullable(false);
-            $table->string('cvv')->nullable(false);
+            $table->unsignedInteger('payment_type_id');
+            $table->string('card_holder_name')->nullable(true)->default(null);
+            $table->string('card_number', 30)->nullable();
+            $table->string('expiry_date')->nullable(true)->default(null);
+            $table->string('cvv')->nullable(true)->default(null);
             $table->timestamps();
         });
     }
