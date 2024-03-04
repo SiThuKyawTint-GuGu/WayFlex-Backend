@@ -40,7 +40,7 @@ class FlightTransaction extends Model
         return $this->belongsTo(FlightTicket::class);
     }
 
-    public function coupon_id()
+    public function coupon()
     {
         return $this->belongsTo(Coupon::class);
     }

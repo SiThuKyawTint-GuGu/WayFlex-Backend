@@ -20,7 +20,7 @@ return new class extends Migration
             $table->bigInteger('fare_tax')->nullable(false);
             $table->bigInteger('total_amount')->nullable(false);
             $table->date('transaction_date')->nullable(false);
-            $table->unsignedInteger('coupon_id');
+            $table->unsignedInteger('coupon_id')->nullable(true)->default(null);
             $table->unsignedInteger('payment_form_id');
             $table->integer('passenger_count')->nullable(false);
             $table->integer('seat_count')->nullable(false);

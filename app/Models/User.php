@@ -30,7 +30,9 @@ class User extends Authenticatable
         'image',
         'currency_id',
         'country_id',
-        'role_id'
+        'role_id',
+        'count',
+        'coupon_count',
     ];
 
     /**
@@ -72,4 +74,5 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
 }

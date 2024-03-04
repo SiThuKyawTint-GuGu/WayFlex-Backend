@@ -26,7 +26,9 @@ return new class extends Migration
             $table->unsignedInteger('currency_id')->default(null)->nullable(true);;
             $table->unsignedInteger('level_id')->default(null)->nullable(true);;
             $table->unsignedInteger('country_id')->default(null)->nullable(true);;
-            $table->unsignedInteger('role_id')->default(null)->nullable(true);;
+            $table->unsignedInteger('role_id')->default(null)->nullable(true);
+            $table->bigInteger('count')->default(0)->nullable(true);
+            $table->bigInteger('coupon_count')->default(0)->nullable(true);
             $table->rememberToken();
             $table->timestamps();
         });

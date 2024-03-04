@@ -25,7 +25,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $queryBuilder = User::with($this->queryWith);
+        $queryBuilder = User::with($this->queryWith)->select('id', 'name', 'email', 'phone', 'role_id','level_id','address');
         if ($request->has('role')) {
             $role = Role::where("name", $request->role)->first();
             if ($role) {

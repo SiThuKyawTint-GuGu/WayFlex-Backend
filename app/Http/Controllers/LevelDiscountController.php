@@ -11,7 +11,7 @@ class LevelDiscountController extends Controller
 
     public function index()
     {
-        return response()->json(LevelDiscount::with($this->queryWith)->get());
+        return response()->json(LevelDiscount::with($this->queryWith)->orderBy('id', 'desc')->get());
     }
 
     public function store(StoreLevelDiscountRequest $request)

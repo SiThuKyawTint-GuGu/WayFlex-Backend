@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\CouponAddController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\flight\AirlineController;
@@ -56,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('rating', RatingController::class);
     Route::apiResource('payment-type', PaymentTypeController::class);
     Route::apiResource('coupon', CouponController::class);
+    Route::post('coupon-add',[CouponAddController::class,'addCoupon']);
 
     Route::prefix('flight')->name('flight.')->group(function () {
         Route::apiResource('trip-status', TripStatusController::class);
