@@ -11,7 +11,7 @@ class PassengerTypeController extends Controller
 {
     public function index()
     {
-        return response()->json(PassengerType::orderBy("id", "desc")->get());
+        return response()->json(PassengerType::get());
     }
 
     public function store(StorePassengerTypeRequest $request)

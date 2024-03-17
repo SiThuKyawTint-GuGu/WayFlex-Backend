@@ -10,7 +10,7 @@ class FlightClassController extends Controller
 {
     public function index()
     {
-        return response()->json(FlightClass::orderBy('id','desc')->get());
+        return response()->json(FlightClass::get());
     }
 
     public function store(StoreFlightClassRequest $request)

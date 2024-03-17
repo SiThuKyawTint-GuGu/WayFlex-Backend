@@ -70,6 +70,14 @@ class UserController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(["message" => 'The provided credentials are incorrect.'], 401);
         }
+
+        if($request->role == "Client"){
+            $roleName = Role::where('name','Client')->first();
+            if($roleName->id !== $user->role_id){
+                return response()->json(["message" => 'This account is not for Client.'], 401);
+            }
+        }
+
         $token = $this->generateTokenService->GenerateToken($user);
         return response()->json([
             'user' => $user,

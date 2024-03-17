@@ -18,7 +18,6 @@ class FlightTripController extends Controller
         if ($request->has('flight_trip_id')) {
             $query->where('id', $request->flight_trip_id);
         }
-        $query->orderBy('id', 'desc');
         $flightTrips = $query->get();
 
         return response()->json($flightTrips);

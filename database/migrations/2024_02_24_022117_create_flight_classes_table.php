@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('flight_classes', function (Blueprint $table) {
             $table->id();
             $table->string("name")->nullable(false);
+            $table->string("description")->nullable(true)->default(null);
             $table->timestamps();
         });
     }

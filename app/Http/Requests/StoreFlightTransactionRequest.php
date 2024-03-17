@@ -31,8 +31,7 @@ class StoreFlightTransactionRequest extends FormRequest
             'transaction_date' => 'required',
             'discount_amount' => 'required',
             'normal_amount' => 'required',
-            'level_discount_id' => 'required|numeric|exists:level_discounts,id',
-            'passenger_type_id' => 'required|numeric|exists:passenger_types,id',
+            'level_discount_id' => 'required|numeric|exists:level_discounts,id'
         ];
     }
 }
