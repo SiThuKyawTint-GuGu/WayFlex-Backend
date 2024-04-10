@@ -19,10 +19,11 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFlightTransactionRequest;
 use App\Models\CouponCountTime;
+use App\Models\FlightTrip;
+
 
 class FlightTransactionController extends Controller
 {
-
     /**
      * @var string[]|\Closure[]
      */
@@ -95,15 +96,7 @@ class FlightTransactionController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create payment form
-            $paymentForm = new PaymentForm([
-                'payment_type_id' => $request->payment_type_id,
-                'card_holder_name' => $request->card_holder_name,
-                'card_number' => $request->card_number,
-                'expiry_date' => $request->expiry_date,
-                'cvv' => $request->cvv,
-            ]);
-            $paymentForm->save();
+            $paymentForm = PaymentForm::where('id',$request->payment_form_id)->first();
 
             // Validate and process coupons
             $coupon = $this->processCoupons($request);
@@ -112,12 +105,12 @@ class FlightTransactionController extends Controller
             $this->updateUserCounts($request);
 
             // Create flight transaction
-            $this->createFlightTransaction($request, $paymentForm, $coupon);
+            $flightTransaction = $this->createFlightTransaction($request, $paymentForm, $coupon);
 
             // Commit the transaction
             DB::commit();
 
-            return response()->json(['message' => 'Flight Transaction created successfully'], 200);
+            return response()->json($flightTransaction, 200);
         } catch (Exception $e) {
             // Rollback in case of an exception
             DB::rollBack();
@@ -125,6 +118,145 @@ class FlightTransactionController extends Controller
             return response()->json(['message' => 'Error creating Flight Transaction', 'error' => $e->getMessage()], 500);
         }
     }
+
+
+    public function searchFlightTicket(Request $request)
+    {
+        try {
+            $query = FlightTicket::with(['flight_category', 'system', 'departure_airport', 'departure_city.country', 'arrival_city.country', 'arrive_airport', 'trip_status', 'flight_trip', 'weight', 'ticket_status', 'meal'])
+                ->where('departure_airport_id', $request->departure_airport_id);
+
+            if ($request->has('arrive_airport_id')) {
+                $query->where('arrive_airport_id', $request->arrive_airport_id);
+            }
+
+            $ticket = $query->first();
+
+            if (!$ticket) {
+                return response()->json(['message' => 'No available ticket found for the given criteria.'], 404);
+            }
+
+            if ($request->has('departure_date') && $request->has('arrival_date')) {
+                if ($ticket->departure_date !== $request->departure_date || $ticket->arrival_date !== $request->arrival_date) {
+                    return response()->json(['message' => 'Ticket is not available for the specified departure and arrival dates.'], 404);
+                }
+            } elseif ($request->has('departure_date') && !$request->has('arrival_date')) {
+                if ($ticket->departure_date !== $request->departure_date) {
+                    return response()->json(['message' => 'Ticket is not available for the specified departure date.'], 404);
+                }
+            }
+
+            if ($request->has('flight_trip_id')) {
+                if ($ticket->flight_trip_id != $request->flight_trip_id) {
+                    $flightTrip = FlightTrip::find($request->flight_trip_id);
+                    if (!$flightTrip) {
+                        return response()->json(['message' => 'Flight trip not found.'], 404);
+                    }
+                    return response()->json(['message' => 'The ticket does not belong to ' . $flightTrip->name], 404);
+                }
+            }
+
+            if ($request->has('travelers')) {
+                $qty = 0;
+                $travelersData = $request->travelers;
+                foreach ($travelersData as $item) {
+                    $qty += $item['qty'];
+                }
+                $airlineNumbers = AirlineNumber::where('flight_ticket_id', $ticket->id)->first();
+
+                $seatNumbers = AirlineSeat::where('airline_number_id', $airlineNumbers->id)
+                    ->where('seat_status', 'active')
+                    ->get();
+
+                $availableSeatsCount = $seatNumbers->count();
+                if ($availableSeatsCount < $qty) {
+                    $errorMessage = "Not enough seats available. Only $availableSeatsCount seats left in the database.";
+                    return response()->json(['message' => $errorMessage], 404);
+                }
+            }
+
+            if ($request->has('flight_class_id')) {
+                $airlineNumber = AirlineNumber::where('flight_ticket_id', $ticket->id)->first();
+                if ($airlineNumber->flight_class_id != $request->flight_class_id) {
+                    $flightClass = AirlineNumber::with(['flight_class'])->find($airlineNumber->id);
+                    if (!$flightClass) {
+                        return response()->json(['message' => 'Flight Class not found.'], 404);
+                    }
+                    return response()->json(['message' => 'The ticket is only for ' . $flightClass->flight_class->name . ' Class'], 404);
+                }
+            }
+
+            if($ticket){
+                $AirlineNumber = AirlineNumber::with(['airline'])->where('flight_ticket_id',$ticket->id)->first();
+                $ticket->flight_number = $AirlineNumber;
+                $price = AirlineSeat::with(['flight_ticket_price'])->where('id',$AirlineNumber->id)->first();
+                $ticket->ticket_price = $price;
+            }
+
+            return response()->json($ticket, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Internal server error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function searchFlightSeat(Request $request)
+    {
+        $ticketID = $request->ticket_id;
+        if ($ticketID) {
+            $AirlineNumber = AirlineNumber::where('flight_ticket_id', $ticketID)->first();
+            if ($AirlineNumber) {
+                $seats = AirlineSeat::where('airline_number_id', $AirlineNumber->id)->get();
+                return response()->json($seats, 200);
+            } else {
+                return response()->json(['error' => 'Flight number not found'], 404);
+            }
+        } else {
+            return response()->json(['error' => 'Ticket ID is required'], 400);
+        }
+    }
+
+ public function checkCoupon(Request $request)
+{
+    $coupon = null;
+
+    // Validate and process coupons
+    if ($request->coupon_number !== null) {
+        $flightTicket = FlightTicket::findOrFail($request->flight_ticket_id);
+
+        $coupon = Coupon::where('coupon_number', $request->coupon_number)->first();
+
+        if (!$coupon) {
+            return response()->json(['error' => 'Invalid coupon number.'], 400);
+        }
+
+        $userCoupon = CouponList::where('user_id', $request->user()->id)
+            ->where('coupon_id', $coupon->id)->first();
+
+        if (!$userCoupon) {
+            return response()->json(['error' => 'This coupon is not available in your account.'], 400);
+        }
+
+        if ($userCoupon->status != 'active') {
+            return response()->json(['error' => 'This coupon has already been used.'], 400);
+        }
+
+        if ($coupon->system_id !== $flightTicket->system_id) {
+            $systemType = System::findOrFail($coupon->system_id);
+            $errorMessage = 'This coupon is not for this ticket. Only for ' . $systemType->name . ' ticket';
+            return response()->json(['error' => $errorMessage], 400);
+        }
+
+        if (now()->greaterThan($coupon->expire_date)) {
+            $errorMessage = 'The coupon has expired. The expiration date was ' . $coupon->expire_date;
+            return response()->json(['error' => $errorMessage], 400);
+        }
+    } else {
+        return response()->json(['error' => 'Coupon is required!'], 400);
+    }
+
+    return response()->json($coupon, 200);
+}
+
 
     private function processCoupons(Request $request)
     {
@@ -210,7 +342,7 @@ class FlightTransactionController extends Controller
         // Create flight transaction
         $flightTransaction = new FlightTransaction([
             'user_id' => $request->user()->id,
-            'payment_type_id' => $request->payment_type_id,
+            'payment_type_id' => $paymentForm->payment_type_id,
             'flight_ticket_id' => $request->flight_ticket_id,
             'ticket_price' => $request->ticket_price,
             'fare_tax' => $request->fare_tax,
@@ -235,16 +367,24 @@ class FlightTransactionController extends Controller
             $flightTransaction->passengers()->attach($passengerQty);
         }
 
-        // Select seats for the flight transaction
-        $selectSeats = $seatNumbers->take($totalPassenger);
+        $soldOutSeat = [];
+        $seats = $request->seat_type_id;
+        foreach($seats as $seat){
+            $seatStatus = AirlineSeat::where('id', $seat)->first();
+            if($seatStatus->seat_status !== 'active'){
+                $soldOutSeat[] = $seatStatus->seat_number;
 
-        // Update seat status and attach seats to the flight transaction
-        foreach ($selectSeats as $selectSeat) {
-            AirlineSeat::where('id', $selectSeat->id)->update(['seat_status' => 'done']);
-            $flightTransaction->seats()->attach($selectSeat->id);
+            }else{
+                AirlineSeat::where('id', $seat)->update(['seat_status' => 'done']);
+                $flightTransaction->seats()->attach($seat);
+            }
         }
 
-        return $flightTransaction;
-    }
+        if(!empty($soldOutSeat)){
+        $errorMessage = "Seat Numbers " . implode(',',$soldOutSeat) ." are sold out!";
+        throw new Exception($errorMessage);
+        }
 
+        return $flightTransaction::getAllWithRelationships();
+    }
 }

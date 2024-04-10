@@ -27,6 +27,7 @@ use App\Http\Controllers\LevelDiscountController;
 use App\Http\Controllers\PaymentTypeController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PaymentFormController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,10 +55,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('currencies', CurrencyController::class);
     Route::apiResource('cities', CityController::class);
     Route::apiResource('level-discount', LevelDiscountController::class);
+    Route::get('user-level-discount', [LevelDiscountController::class, "getUserLevelDiscount"]);
     Route::apiResource('rating', RatingController::class);
     Route::apiResource('payment-type', PaymentTypeController::class);
     Route::apiResource('coupon', CouponController::class);
-    Route::post('coupon-add',[CouponAddController::class,'addCoupon']);
+    Route::post('coupon-add', [CouponAddController::class, 'addCoupon']);
+    Route::apiResource('payment-form',PaymentFormController::class);
 
     Route::prefix('flight')->name('flight.')->group(function () {
         Route::apiResource('trip-status', TripStatusController::class);
@@ -75,9 +78,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('ticket-status', TicketStatusController::class);
         Route::apiResource('meal', MealController::class);
         Route::apiResource('weight', WeightController::class);
-        Route::get('flight-ticket-count',[FlightTicketController::class,'ticketCount']);
+        Route::get('flight-ticket-count', [FlightTicketController::class, 'ticketCount']);
         Route::apiResource('passenger-type', PassengerTypeController::class);
         Route::apiResource('flight-transaction', FlightTransactionController::class);
+        Route::get('search-flight-ticket', [FlightTransactionController::class, 'searchFlightTicket']);
+        Route::get('search-flight-seat', [FlightTransactionController::class, 'searchFlightSeat']);
+        Route::get('check-coupon', [FlightTransactionController::class, 'checkCoupon']);
     });
 });
 

@@ -23,7 +23,9 @@ class StoreFlightTransactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'payment_type_id' => 'required|numeric|exists:payment_types,id',
+            'payment_form_id' => 'required|numeric|exists:payment_forms,id',
+            'passenger_type_id' => 'required|not_null',
+            'seat_type_id' => 'required|not_null',
             'flight_ticket_id' => 'required|numeric|exists:flight_tickets,id',
             'ticket_price' => 'required',
             'fare_tax' => 'required',

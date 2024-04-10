@@ -10,7 +10,10 @@ class PaymentForm extends Model
     use HasFactory;
     protected $fillable = [
         'payment_type_id',
-        'card_holder_name',
+        'user_id',
+        'name',
+        'otp_code',
+        'phone_number',
         'card_number',
         'expiry_date',
         'cvv'
@@ -18,5 +21,9 @@ class PaymentForm extends Model
 
     public function payment_type(){
         return $this->belongsTo(PaymentType::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 }

@@ -67,4 +67,17 @@ class FlightTransaction extends Model
         ->withTimestamps();
     }
 
+    public static function getAllWithRelationships(){
+        return self::with([
+            'user',
+            'payment_type',
+            'flight_ticket',
+            'coupon',
+            'payment_form',
+            'level_discount',
+            'passengers',
+            'seats'
+        ])->get();
+    }
+
 }
