@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('payment_type_id');
             $table->bigInteger('ticket_price')->nullable(false);
             $table->bigInteger('fare_tax')->nullable(false);
+            $table->string('ticket_number')->nullable(false);
             $table->bigInteger('total_amount')->nullable(false);
             $table->date('transaction_date')->nullable(false);
             $table->unsignedInteger('coupon_id')->nullable(true)->default(null);

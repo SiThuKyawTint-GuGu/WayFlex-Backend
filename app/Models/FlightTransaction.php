@@ -11,6 +11,7 @@ class FlightTransaction extends Model
     protected $fillable = [
         "user_id",
         "payment_type_id",
+        "ticket_number",
         "flight_ticket_id",
         "ticket_price",
         "fare_tax",
@@ -67,17 +68,17 @@ class FlightTransaction extends Model
         ->withTimestamps();
     }
 
-    public static function getAllWithRelationships(){
-        return self::with([
-            'user',
-            'payment_type',
-            'flight_ticket',
-            'coupon',
-            'payment_form',
-            'level_discount',
-            'passengers',
-            'seats'
-        ])->get();
-    }
+    // public static function getAllWithRelationships(){
+    //     return self::with([
+    //         'user',
+    //         'payment_type',
+    //         'flight_ticket',
+    //         'coupon',
+    //         'payment_form',
+    //         'level_discount',
+    //         'passengers',
+    //         'seats'
+    //     ])->get();
+    // }
 
 }
