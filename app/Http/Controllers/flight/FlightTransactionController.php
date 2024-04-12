@@ -90,6 +90,22 @@ class FlightTransactionController extends Controller
 
         return response()->json($formattedData);
     }
+    public function getUserFlightTransaction(Request $request)
+    {
+        $userFlightTran = FlightTransaction::where('user_id', $request->user()->id)
+            ->get();
+
+        $groupedTransactions = $userFlightTran->groupBy('transaction_date')->map(function($transaction){
+            $totalAmount = $transaction->sum('total_amount');
+            return [
+                'transaction_date' => $transaction->first()->transaction_date,
+                'total_amount' => $totalAmount,
+                'transactions' => $transaction,
+            ];
+        });
+
+        return response()->json($groupedTransactions);
+    }
 
     public function store(StoreFlightTransactionRequest $request)
     {
@@ -136,11 +152,11 @@ class FlightTransactionController extends Controller
                 return response()->json(['message' => 'No available ticket found for the given criteria.'], 404);
             }
 
-            if ($request->has('departure_date') && $request->has('arrival_date')) {
-                if ($ticket->departure_date !== $request->departure_date || $ticket->arrival_date !== $request->arrival_date) {
-                    return response()->json(['message' => 'Ticket is not available for the specified departure and arrival dates.'], 404);
+            if ($request->has('departure_date') && $request->has('return_date')) {
+                if ($ticket->departure_date !== $request->departure_date || $ticket->return_date !== $request->return_date) {
+                    return response()->json(['message' => 'Ticket is not available for the specified departure and return dates.'], 404);
                 }
-            } elseif ($request->has('departure_date') && !$request->has('arrival_date')) {
+            } elseif ($request->has('departure_date') && !$request->has('return_date')) {
                 if ($ticket->departure_date !== $request->departure_date) {
                     return response()->json(['message' => 'Ticket is not available for the specified departure date.'], 404);
                 }
@@ -341,13 +357,13 @@ class FlightTransactionController extends Controller
 
         //Create Ticket Number
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $length = 10;
-        $ticketNumber = '';
+        $length = 9;
+        $ticketNumber = '#';
+
         for ($i = 0; $i < $length; $i++) {
             $randomIndex = rand(0, strlen($characters) - 1);
             $ticketNumber .= $characters[$randomIndex];
         }
-
         $flightTransaction = new FlightTransaction([
             'ticket_number' => $ticketNumber,
             'user_id' => $request->user()->id,

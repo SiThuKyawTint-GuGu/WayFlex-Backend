@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
     Route::post('logout', [UserController::class, "logout"]);
     Route::post('changepassword', [UserController::class, "changePassword"]);
+    Route::get('get-user-detail', [UserController::class, "getUser"]);
     Route::apiResource('levels', LevelController::class);
     Route::apiResource('countries', CountryController::class);
     Route::apiResource('currencies', CurrencyController::class);
@@ -84,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('search-flight-ticket', [FlightTransactionController::class, 'searchFlightTicket']);
         Route::get('search-flight-seat', [FlightTransactionController::class, 'searchFlightSeat']);
         Route::get('check-coupon', [FlightTransactionController::class, 'checkCoupon']);
+        Route::get('user-flight-transaction', [FlightTransactionController::class, 'getUserFlightTransaction']);
     });
 });
 

@@ -38,6 +38,15 @@ class UserController extends Controller
         return response()->json($queryBuilder->get());
     }
 
+    public function getUser(Request $request)
+    {
+        $queryBuilder = User::with($this->queryWith)
+        ->select('id', 'name', 'email', 'phone', 'role_id', 'level_id', 'address')
+        ->where('id',$request->user()->id)
+        ->first();
+        return response()->json($queryBuilder);
+    }
+
     public function register(StoreUserRequest $request)
     {
         $validated = $request->validated();
