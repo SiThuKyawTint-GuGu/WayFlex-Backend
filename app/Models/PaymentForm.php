@@ -16,6 +16,7 @@ class PaymentForm extends Model
         'phone_number',
         'card_number',
         'expiry_date',
+        'status',
         'cvv'
     ];
 

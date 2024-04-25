@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CouponAddController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\flight\SystemController;
 use App\Http\Controllers\flight\TicketStatusController;
 use App\Http\Controllers\flight\TripStatusController;
 use App\Http\Controllers\flight\WeightController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LevelDiscountController;
 use App\Http\Controllers\PaymentTypeController;
@@ -51,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [UserController::class, "logout"]);
     Route::post('changepassword', [UserController::class, "changePassword"]);
     Route::get('get-user-detail', [UserController::class, "getUser"]);
+    Route::post('user-change-language', [UserController::class, 'changeLanguage']);
     Route::apiResource('levels', LevelController::class);
     Route::apiResource('countries', CountryController::class);
     Route::apiResource('currencies', CurrencyController::class);
@@ -61,7 +64,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('payment-type', PaymentTypeController::class);
     Route::apiResource('coupon', CouponController::class);
     Route::post('coupon-add', [CouponAddController::class, 'addCoupon']);
+    Route::get('user-coupon', [CouponController::class, 'userCoupon']);
     Route::apiResource('payment-form',PaymentFormController::class);
+    Route::apiResource('languages', LanguageController::class);
+
 
     Route::prefix('flight')->name('flight.')->group(function () {
         Route::apiResource('trip-status', TripStatusController::class);
@@ -86,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('search-flight-seat', [FlightTransactionController::class, 'searchFlightSeat']);
         Route::get('check-coupon', [FlightTransactionController::class, 'checkCoupon']);
         Route::get('user-flight-transaction', [FlightTransactionController::class, 'getUserFlightTransaction']);
+        Route::get('user-ticket-calendar', [CalendarController::class, 'getUserTicketCalendar']);
     });
 });
 

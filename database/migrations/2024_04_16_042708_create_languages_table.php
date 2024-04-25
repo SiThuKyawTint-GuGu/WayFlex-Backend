@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('level_discounts', function (Blueprint $table) {
+        Schema::create('languages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('level_id');
-            $table->integer("amount")->nullable(true)->default(0);
-            $table->integer("discount_percentage")->nullable(true)->default(0);
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('level_discounts');
+        Schema::dropIfExists('languages');
     }
 };

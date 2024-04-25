@@ -5,16 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LevelDiscount extends Model
+class Language extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "level_id",
-        "amount",
-        "discount_percentage"
+        "name",
     ];
-
-    public function level(){
-        return $this->belongsTo(Level::class);
-    }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCouponRequest;
 use App\Models\Coupon;
+use App\Models\CouponList;
+use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
@@ -19,5 +21,10 @@ class CouponController extends Controller
         $validated = $request->all();
         $coupon = Coupon::create($validated);
         return response()->json(Coupon::with($this->queryWith)->find($coupon->id));
+    }
+
+    public function userCoupon(Request $request){
+            $coupon = CouponList::with(['coupon','coupon.system'])->where('user_id',$request->user()->id)->orderBy('status','asc')->get();
+            return response()->json($coupon);
     }
 }

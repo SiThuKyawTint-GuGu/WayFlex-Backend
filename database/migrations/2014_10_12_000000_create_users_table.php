@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('nrc')->default(null)->nullable(true);;
             $table->string('image')->default(null)->nullable(true);;
             $table->unsignedInteger('currency_id')->default(null)->nullable(true);;
+            $table->unsignedInteger('language_id')->default(null)->nullable(true);;
             $table->unsignedInteger('level_id')->default(null)->nullable(true);;
             $table->unsignedInteger('country_id')->default(null)->nullable(true);;
             $table->unsignedInteger('role_id')->default(null)->nullable(true);

@@ -20,6 +20,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFlightTransactionRequest;
 use App\Models\CouponCountTime;
 use App\Models\FlightTrip;
+use Carbon\Carbon;
 
 
 class FlightTransactionController extends Controller
@@ -92,17 +93,18 @@ class FlightTransactionController extends Controller
     }
     public function getUserFlightTransaction(Request $request)
     {
-        $userFlightTran = FlightTransaction::where('user_id', $request->user()->id)
+        $userFlightTran = FlightTransaction::with(['flight_ticket.departure_city', 'flight_ticket.arrival_city', 'payment_form.payment_type'])->where('user_id', $request->user()->id)
             ->get();
 
-        $groupedTransactions = $userFlightTran->groupBy('transaction_date')->map(function($transaction){
+        $groupedTransactions = $userFlightTran->groupBy('transaction_date')->map(function ($transaction) {
             $totalAmount = $transaction->sum('total_amount');
+            $formattedDate = Carbon::parse($transaction->first()->transaction_date)->format('l, d M');
             return [
-                'transaction_date' => $transaction->first()->transaction_date,
+                'transaction_date' => $formattedDate,
                 'total_amount' => $totalAmount,
                 'transactions' => $transaction,
             ];
-        });
+        })->values();
 
         return response()->json($groupedTransactions);
     }
@@ -245,19 +247,9 @@ class FlightTransactionController extends Controller
                 return response()->json(['error' => 'Invalid coupon number.'], 400);
             }
 
-            $userCoupon = CouponList::where('user_id', $request->user()->id)
-                ->where('coupon_id', $coupon->id)->first();
-
-            if (!$userCoupon) {
-                return response()->json(['error' => 'This coupon is not available in your account.'], 400);
-            }
-
-            if ($userCoupon->status != 'active') {
-                return response()->json(['error' => 'This coupon has already been used.'], 400);
-            }
-
             if ($coupon->system_id !== $flightTicket->system_id) {
                 $systemType = System::findOrFail($coupon->system_id);
+
                 $errorMessage = 'This coupon is not for this ticket. Only for ' . $systemType->name . ' ticket';
                 return response()->json(['error' => $errorMessage], 400);
             }
@@ -266,11 +258,24 @@ class FlightTransactionController extends Controller
                 $errorMessage = 'The coupon has expired. The expiration date was ' . $coupon->expire_date;
                 return response()->json(['error' => $errorMessage], 400);
             }
+
+            $userCoupon = CouponList::where('user_id', $request->user()->id)
+                ->where('coupon_id', $coupon->id)->where('status', 'active')->get();
+
+            $coupons = CouponList::where('coupon_id', $coupon->id)->first();
+            if (!$coupons) {
+                return response()->json(['error' => 'This coupon is not available in your account.'], 400);
+            }
+
+            if (!isset($userCoupon[0])) {
+                return response()->json(['error' => 'This coupon has already been used.'], 400);
+            }
+
+            return response()->json($coupon, 200);
+
         } else {
             return response()->json(['error' => 'Coupon is required!'], 400);
         }
-
-        return response()->json($coupon, 200);
     }
 
 
@@ -289,13 +294,14 @@ class FlightTransactionController extends Controller
             }
 
             $userCoupon = CouponList::where('user_id', $request->user()->id)
-                ->where('coupon_id', $coupon->id)->first();
+                ->where('coupon_id', $coupon->id)->where('status', 'active')->get();
 
-            if (!$userCoupon) {
+            $coupons = CouponList::where('coupon_id', $coupon->id)->first();
+            if (!$coupons) {
                 throw new Exception('This coupon is not available in your account.');
             }
 
-            if ($userCoupon->status != 'active') {
+            if (!isset($userCoupon[0])) {
                 throw new Exception('This coupon has already been used.');
             }
 
@@ -310,8 +316,12 @@ class FlightTransactionController extends Controller
                 throw new Exception($errorMessage);
             }
 
-            // Update coupon status
-            $userCoupon->update(['status' => 'done']);
+            $userCou = CouponList::where('user_id', $request->user()->id)
+            ->where('coupon_id', $coupon->id)
+            ->where('status', 'active')
+            ->first();
+
+            $userCou->update(['status' => 'done']);
         }
 
         return $coupon;

@@ -13,7 +13,10 @@ class PaymentFormController extends Controller
 
       public function index(Request $request)
     {
-        return response()->json(PaymentForm::where('user_id',$request->user()->id)->with($this->queryWith)->get());
+        return response()->json(PaymentForm::
+        where('user_id',$request->user()->id)
+        ->where('status','active')
+        ->with($this->queryWith)->get());
     }
 
 
@@ -32,8 +35,9 @@ class PaymentFormController extends Controller
     {
         $paymentForm = PaymentForm::find($id);
         if ($paymentForm) {
-            $paymentForm->delete();
-            return response()->json(['message' => 'Successfully Deleted.', 'id' => $paymentForm->id]);
+            $paymentForm->status = 'done';
+            $paymentForm->save();
+            return response()->json(['message' => 'Status updated successfully.', 'id' => $paymentForm->id]);
         } else {
             return response()->json(['message' => "Not found id: " . $id], 404);
         }

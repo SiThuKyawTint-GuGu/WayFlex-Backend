@@ -29,6 +29,7 @@ class User extends Authenticatable
         'level_id',
         'image',
         'currency_id',
+        'language_id',
         'country_id',
         'role_id',
         'count',
@@ -69,6 +70,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Currency::class);
     }
+
+    public function language()
+    {
+        return $this->belongsTo(Language::class);
+    }
+
 
     public function role()
     {

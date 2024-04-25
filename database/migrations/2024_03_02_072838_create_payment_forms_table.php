@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('card_number', 30)->nullable();
             $table->date('expiry_date')->nullable(true)->default(null);
             $table->string('cvv')->nullable(true)->default(null);
+            $table->string('status')->nullable(true)->default('active');
             $table->timestamps();
         });
     }
